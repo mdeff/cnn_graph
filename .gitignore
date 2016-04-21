@@ -61,5 +61,5 @@ target/
 # IPython checkpoints
 .ipynb_checkpoints
 
-# Datasets from mldata
-mldata
+# Datasets
+*data*
