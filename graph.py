@@ -76,13 +76,22 @@ def laplacian(W, normalized=True):
     assert np.abs(L - L.T).mean() < 1e-10
     return L, lmax
 
-def fourier(L):
+def fourier(L, algo='eigh', k=1):
     """Return the Fourier basis, i.e. the EVD of the Laplacian."""
 
     def sort(lamb, U):
         idx = lamb.argsort()
         return lamb[idx], U[:,idx]
 
-    lamb, U = np.linalg.eig(L.toarray())
-    lamb, U = sort(lamb, U)
+    if algo is 'eig':
+        lamb, U = np.linalg.eig(L.toarray())
+        lamb, U = sort(lamb, U)
+    elif algo is 'eigh':
+        lamb, U = np.linalg.eigh(L.toarray())
+    elif algo is 'eigs':
+        lamb, U = scipy.sparse.linalg.eigs(L, k=k, which='SM')
+        lamb, U = sort(lamb, U)
+    elif algo is 'eigsh':
+        lamb, U = scipy.sparse.linalg.eigsh(L, k=k, which='SM')
+
     return lamb, U
