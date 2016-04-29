@@ -69,15 +69,16 @@ def laplacian(W, normalized=True):
         I = scipy.sparse.identity(d.size, dtype=D.dtype)
         L = I - D * W * D
 
-    # Upper-bound on the spectrum.
-    if normalized:
-        lmax = 2
-    else:
-        lmax = scipy.sparse.linalg.eigsh(
-                L, k=1, which='LM', return_eigenvectors=False)[0]
-
     assert np.abs(L - L.T).mean() < 1e-10
-    return L, lmax
+    return L
+
+def lmax(L, normalized=True):
+    """Upper-bound on the spectrum."""
+    if normalized:
+        return 2
+    else:
+        return scipy.sparse.linalg.eigsh(
+                L, k=1, which='LM', return_eigenvectors=False)[0]
 
 def fourier(L, algo='eigh', k=1):
     """Return the Fourier basis, i.e. the EVD of the Laplacian."""
