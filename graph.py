@@ -1,13 +1,15 @@
 import numpy as np
 import scipy.sparse, scipy.sparse.linalg, scipy.spatial.distance
 
+dtype = np.float32
+
 def grid(m):
     """Return the embedding of a grid graph."""
     M = m**2
-    x = np.linspace(0,1,m)
-    y = np.linspace(0,1,m)
+    x = np.linspace(0,1,m, dtype=dtype)
+    y = np.linspace(0,1,m, dtype=dtype)
     xx, yy = np.meshgrid(x, y)
-    z = np.empty((M,2))
+    z = np.empty((M,2), dtype)
     z[:,0] = xx.reshape(M)
     z[:,1] = yy.reshape(M)
     return z
@@ -19,6 +21,7 @@ def adjacency(z, k=4):
     # Compute pairwise distances.
     d = scipy.spatial.distance.pdist(z, 'euclidean')
     d = scipy.spatial.distance.squareform(d)
+    d = d.astype(dtype)
 
     # k-NN graph.
     idx = np.argsort(d)[:,1:k+1]
