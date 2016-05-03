@@ -99,3 +99,50 @@ def fourier(L, algo='eigh', k=1):
         lamb, U = scipy.sparse.linalg.eigsh(L, k=k, which='SM')
 
     return lamb, U
+
+def lanczos_basis(L, X, K):
+    """
+    Lanczos algorithm which computes the orthogonal matrix V and the
+    tri-diagonal matrix H.
+    """
+    M, N = X.shape
+    a = np.empty((K, N), dtype)
+    b = np.zeros((K, N), dtype)
+    V = np.empty((K, M, N), dtype)
+    V[0,...] = X / np.linalg.norm(X, axis=0)
+    for k in range(K-1):
+        W = L.dot(V[k,...])
+        a[k,:] = np.sum(W * V[k,...], axis=0)
+        W = W - a[k,:] * V[k,...] - (b[k,:] * V[k-1,...] if k>0 else 0)
+        b[k+1,:] = np.linalg.norm(W, axis=0)
+        V[k+1,...] = W / b[k+1,:]
+    a[K-1,:] = np.sum(L.dot(V[K-1,...]) * V[K-1,...], axis=0)
+    return V, a, b
+
+def lanczos_diag_H(a, b):
+    """Diagonalize the tri-diagonal H matrix."""
+    K, N = a.shape
+    H = np.zeros((K*K, N), dtype)
+    H[:K**2:K+1, :] = a
+    H[1:(K-1)*K:K+1, :] = b[1:,:]
+    H.shape = (K, K, N)
+    Q = np.linalg.eigh(H.T, UPLO='L')[1]
+    Q = np.swapaxes(Q,1,2).T
+    return Q
+
+def lanczos(L, X, K):
+    """
+    Given the graph Laplacian and a data matrix, return a data matrix which can
+    be multiplied by the filter coefficients to filter X using the Lanczos
+    polynomial approximation.
+    """
+    V, a, b = lanczos_basis(L, X, K)
+    Q = lanczos_diag_H(a, b)
+    M, N = X.shape
+    Xt = np.empty((K, M, N), dtype)
+    for n in range(N):
+        Xt[...,n] = Q[...,n].T @ V[...,n]
+    Xt *= Q[0,:,np.newaxis,:]
+    Xt *= np.linalg.norm(X, axis=0)
+    return Xt
+#    return Xt, Q[0,...]
