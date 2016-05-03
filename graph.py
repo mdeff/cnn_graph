@@ -148,3 +148,27 @@ def lanczos(L, X, K):
     Xt *= np.linalg.norm(X, axis=0)
     return Xt
 #    return Xt, Q[0,...]
+
+def rescale_L(L, lmax=2):
+    """Rescale the Laplacian eigenvalues in [-1,1]."""
+    M, M = L.shape
+    I = scipy.sparse.identity(M, format='csr')
+    return L / lmax * 2 - I
+
+def chebyshev(L, X, K):
+    """Return T_k X where T_k are the Chebyshev polynomials of order up to K.
+    Complexity is O(KMN)."""
+    M, N = X.shape
+
+#    L = rescale_L(L, lmax)
+    # Xt = T @ X: MxM @ MxN.
+    Xt = np.empty((K, M, N), dtype)
+    # Xt_0 = T_0 X = I X = X.
+    Xt[0,...] = X
+    # Xt_1 = T_1 X = L X.
+    if K > 1:
+        Xt[1,...] = L.dot(X)
+    # Xt_k = 2 L Xt_k-1 - Xt_k-2.
+    for k in range(2, K):
+        Xt[k,...] = 2 * L.dot(Xt[k-1,...]) - Xt[k-2,...]
+    return Xt
