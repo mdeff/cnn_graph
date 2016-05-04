@@ -47,13 +47,9 @@ def adjacency(z, k=4):
     # Non-directed graph.
     bigger = W.T > W
     W = W - W.multiply(bigger) + W.T.multiply(bigger)
+
     assert np.abs(W - W.T).mean() < 1e-10
-
-    # CSR sparse matrix format for efficient multiplications.
-    W = W.tocsr()
-    W.eliminate_zeros()
-
-    print("{} > {} edges".format(W.nnz, M*k))
+    assert type(W) is scipy.sparse.csr.csr_matrix
     return W
 
 def laplacian(W, normalized=True):
@@ -72,7 +68,8 @@ def laplacian(W, normalized=True):
         I = scipy.sparse.identity(d.size, dtype=D.dtype)
         L = I - D * W * D
 
-    assert np.abs(L - L.T).mean() < 1e-10
+    assert np.abs(L - L.T).mean() < 1e-9
+    assert type(L) is scipy.sparse.csr.csr_matrix
     return L
 
 def lmax(L, normalized=True):
