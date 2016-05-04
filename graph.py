@@ -152,8 +152,10 @@ def lanczos(L, X, K):
 def rescale_L(L, lmax=2):
     """Rescale the Laplacian eigenvalues in [-1,1]."""
     M, M = L.shape
-    I = scipy.sparse.identity(M, format='csr')
-    return L / lmax * 2 - I
+    I = scipy.sparse.identity(M, format='csr', dtype=dtype)
+    L /= lmax * 2
+    L -= I
+    return L
 
 def chebyshev(L, X, K):
     """Return T_k X where T_k are the Chebyshev polynomials of order up to K.
