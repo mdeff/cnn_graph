@@ -63,6 +63,7 @@ def laplacian(W, normalized=True):
         D = scipy.sparse.diags(d.A.squeeze(), 0)
         L = D - W
     else:
+        d += np.spacing(np.array(0, d.dtype))
         d = 1 / np.sqrt(d)
         D = scipy.sparse.diags(d.A.squeeze(), 0)
         I = scipy.sparse.identity(d.size, dtype=D.dtype)
