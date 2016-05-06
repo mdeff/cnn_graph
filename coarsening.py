@@ -142,8 +142,9 @@ def compute_perm(parents):
 
     # Order of last layer is random (chosen by the clustering algorithm).
     indices = []
-    M_last = max(parents[-1]) + 1
-    indices.append(list(range(M_last)))
+    if len(parents) > 0:
+        M_last = max(parents[-1]) + 1
+        indices.append(list(range(M_last)))
 
     for parent in parents[::-1]:
         #print('parent: {}'.format(parent))
@@ -190,6 +191,9 @@ def perm_data(x, indices):
     Permute data matrix, i.e. exchange node ids,
     so that binary unions form the clustering tree.
     """
+    if indices is None:
+        return x
+
     N, M = x.shape
     Mnew = len(indices)
     assert Mnew >= M
@@ -210,6 +214,9 @@ def perm_adjacency(A, indices):
     Permute adjacency matrix, i.e. exchange node ids,
     so that binary unions form the clustering tree.
     """
+    if indices is None:
+        return A
+
     M, M = A.shape
     Mnew = len(indices)
     A = A.tocoo()
@@ -225,6 +232,6 @@ def perm_adjacency(A, indices):
     A.row = np.array(perm)[A.row]
     A.col = np.array(perm)[A.col]
 
-    assert np.abs(A - A.T).mean() < 1e-10
+    assert np.abs(A - A.T).mean() < 1e-9
     assert type(A) is scipy.sparse.coo.coo_matrix
     return A
