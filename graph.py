@@ -141,7 +141,8 @@ def lanczos(L, X, K):
     Q = diag_H(a, b, K)
     Xt = np.empty((K, M, N), dtype)
     for n in range(N):
-        Xt[...,n] = Q[...,n].T @ V[...,n]
+        #Xt[...,n] = Q[...,n].T @ V[...,n]
+        Xt[...,n] = Q[...,n].T.dot(V[...,n])
     Xt *= Q[0,:,np.newaxis,:]
     Xt *= np.linalg.norm(X, axis=0)
     return Xt
