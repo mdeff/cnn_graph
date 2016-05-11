@@ -63,3 +63,6 @@ target/
 
 # Datasets
 *data*
+
+# Tensorflow summaries
+summaries
