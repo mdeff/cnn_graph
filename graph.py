@@ -17,12 +17,12 @@ def grid(m):
 #class graph(object):
     #self.L
 
-def adjacency(z, k=4):
+def adjacency(z, k=4, metric='euclidean'):
     """Return the adjacency matrix of a kNN graph."""
     M = z.shape[0]
 
     # Compute pairwise distances.
-    d = scipy.spatial.distance.pdist(z, 'euclidean')
+    d = scipy.spatial.distance.pdist(z, metric)
     d = scipy.spatial.distance.squareform(d)
     d = d.astype(dtype)
 
