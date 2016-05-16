@@ -1,5 +1,6 @@
 import numpy as np
 import scipy.sparse, scipy.sparse.linalg, scipy.spatial.distance
+import matplotlib.pyplot as plt
 
 dtype = np.float32
 
@@ -100,6 +101,20 @@ def fourier(L, algo='eigh', k=1):
         lamb, U = scipy.sparse.linalg.eigsh(L, k=k, which='SM')
 
     return lamb, U
+
+def plot_spectrum(L, algo='eig'):
+    """Plot the spectrum of a list of multi-scale Laplacians L."""
+    # Algo is eig to be sure to get all eigenvalues.
+    plt.figure(figsize=(17,5))
+    for i,lap in enumerate(L):
+        lamb, U = fourier(lap, algo)
+        step = 2**i
+        x = range(step//2, L[0].shape[0], step)
+        label = 'L_{} spectrum in [{:1.2e}, {:1.2e}]'.format(i, lamb[0], lamb[-1])
+        plt.plot(x, lamb, '.', label=label)
+    plt.legend(loc='best')
+    plt.xlim(0, L[0].shape[0])
+    plt.ylim(ymin=0)
 
 def lanczos(L, X, K):
     """
