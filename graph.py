@@ -49,9 +49,40 @@ def adjacency(z, k=4, metric='euclidean'):
     bigger = W.T > W
     W = W - W.multiply(bigger) + W.T.multiply(bigger)
 
+    assert W.nnz % 2 == 0
     assert np.abs(W - W.T).mean() < 1e-10
     assert type(W) is scipy.sparse.csr.csr_matrix
     return W
+
+def replace_random_edges(A, noise_level):
+    """Replace randomly chosen edges by random edges."""
+    M, M = A.shape
+    n = int(noise_level * A.nnz // 2)
+
+    indices = np.random.permutation(A.nnz//2)[:n]
+    rows = np.random.randint(0, M, n)
+    cols = np.random.randint(0, M, n)
+    vals = np.random.uniform(0, 1, n)
+    assert len(indices) == len(rows) == len(cols) == len(vals)
+
+    A_coo = scipy.sparse.triu(A, format='coo')
+    assert A_coo.nnz == A.nnz // 2
+    assert A_coo.nnz >= n
+    A = A.tolil()
+
+    for idx,row,col,val in zip(indices,rows,cols,vals):
+        old_row = A_coo.row[idx]
+        old_col = A_coo.col[idx]
+
+        A[old_row,old_col] = 0
+        A[old_col,old_row] = 0
+        A[row,col] = 1
+        A[col,row] = 1
+
+    A.setdiag(0)
+    A = A.tocsr()
+    A.eliminate_zeros()
+    return A
 
 def laplacian(W, normalized=True):
     """Return the Laplacian of the weigth matrix."""
