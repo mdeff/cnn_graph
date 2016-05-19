@@ -1,6 +1,7 @@
-import numpy as np
-import scipy.sparse, scipy.sparse.linalg, scipy.spatial.distance
+import sklearn
 import matplotlib.pyplot as plt
+import scipy.sparse, scipy.sparse.linalg  # scipy.spatial.distance
+import numpy as np
 
 dtype = np.float32
 
@@ -23,9 +24,10 @@ def adjacency(z, k=4, metric='euclidean'):
     M = z.shape[0]
 
     # Compute pairwise distances.
-    d = scipy.spatial.distance.pdist(z, metric)
-    d = scipy.spatial.distance.squareform(d)
-    d = d.astype(dtype)
+    #d = scipy.spatial.distance.pdist(z, metric)
+    #d = scipy.spatial.distance.squareform(d)
+    #d = d.astype(dtype)
+    d = sklearn.metrics.pairwise.pairwise_distances(z, metric=metric, n_jobs=-2)
 
     # k-NN graph.
     idx = np.argsort(d)[:,1:k+1]
