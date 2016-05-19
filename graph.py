@@ -19,29 +19,53 @@ def grid(m):
 #class graph(object):
     #self.L
 
-def adjacency(z, k=4, metric='euclidean'):
-    """Return the adjacency matrix of a kNN graph."""
-    M = z.shape[0]
+def distance_scipy_spatial(z, k=4, metric='euclidean'):
+    """Compute exact pairwise distances."""
+    d = scipy.spatial.distance.pdist(z, metric)
+    d = scipy.spatial.distance.squareform(d)
+    d = d.astype(dtype)
+    # k-NN graph.
+    idx = np.argsort(d)[:, 1:k+1]
+    d.sort()
+    d = d[:, 1:k+1]
+    return d, idx
 
-    # Compute pairwise distances.
-    #d = scipy.spatial.distance.pdist(z, metric)
-    #d = scipy.spatial.distance.squareform(d)
-    #d = d.astype(dtype)
+def distance_sklearn_metrics(z, k=4, metric='euclidean'):
+    """Compute exact pairwise distances."""
     d = sklearn.metrics.pairwise.pairwise_distances(z, metric=metric, n_jobs=-2)
-
     # k-NN graph.
     idx = np.argsort(d)[:,1:k+1]
     d.sort()
     d = d[:,1:k+1]
+    return d, idx
+
+def distance_lshforest(z, k=4, metric='cosine'):
+    """Return an approximation of the k-nearest cosine distances."""
+    assert metric is 'cosine'
+    lshf = sklearn.neighbors.LSHForest()
+    lshf.fit(z)
+    dist, idx = lshf.kneighbors(z, n_neighbors=k+1)
+    assert dist.min() < 1e-10
+    dist[dist<0] = 0
+    return dist, idx
+
+# TODO: sklearn neighbors, PANN, Annoy, FLANN
+
+def adjacency(dist, idx):
+    """Return the adjacency matrix of a kNN graph."""
+    M, k = dist.shape
+    assert M, k == idx.shape
+    assert dist.min() >= 0
+    assert dist.max() <= 1
 
     # Weights.
-    sigma2 = np.mean(d[:,-1])**2
-    d = np.exp(- d**2 / sigma2)
+    sigma2 = np.mean(dist[:,-1])**2
+    dist = np.exp(- dist**2 / sigma2)
 
     # Weight matrix.
     I = np.arange(0, M).repeat(k)
     J = idx.reshape(M*k)
-    V = d.reshape(M*k)
+    V = dist.reshape(M*k)
     W = scipy.sparse.coo_matrix((V, (I, J)), shape=(M, M))
 
     # No self-connections.
