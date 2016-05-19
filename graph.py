@@ -3,9 +3,7 @@ import matplotlib.pyplot as plt
 import scipy.sparse, scipy.sparse.linalg  # scipy.spatial.distance
 import numpy as np
 
-dtype = np.float32
-
-def grid(m):
+def grid(m, dtype=np.float32):
     """Return the embedding of a grid graph."""
     M = m**2
     x = np.linspace(0,1,m, dtype=dtype)
@@ -23,7 +21,6 @@ def distance_scipy_spatial(z, k=4, metric='euclidean'):
     """Compute exact pairwise distances."""
     d = scipy.spatial.distance.pdist(z, metric)
     d = scipy.spatial.distance.squareform(d)
-    d = d.astype(dtype)
     # k-NN graph.
     idx = np.argsort(d)[:, 1:k+1]
     d.sort()
@@ -121,10 +118,10 @@ def laplacian(W, normalized=True):
         D = scipy.sparse.diags(d.A.squeeze(), 0)
         L = D - W
     else:
-        d += np.spacing(np.array(0, d.dtype))
+        d += np.spacing(np.array(0, W.dtype))
         d = 1 / np.sqrt(d)
         D = scipy.sparse.diags(d.A.squeeze(), 0)
-        I = scipy.sparse.identity(d.size, dtype=D.dtype)
+        I = scipy.sparse.identity(d.size, dtype=W.dtype)
         L = I - D * W * D
 
     assert np.abs(L - L.T).mean() < 1e-9
@@ -180,15 +177,16 @@ def lanczos(L, X, K):
     polynomial approximation.
     """
     M, N = X.shape
+    assert L.dtype == X.dtype
 
     def basis(L, X, K):
         """
         Lanczos algorithm which computes the orthogonal matrix V and the
         tri-diagonal matrix H.
         """
-        a = np.empty((K, N), dtype)
-        b = np.zeros((K, N), dtype)
-        V = np.empty((K, M, N), dtype)
+        a = np.empty((K, N), L.dtype)
+        b = np.zeros((K, N), L.dtype)
+        V = np.empty((K, M, N), L.dtype)
         V[0,...] = X / np.linalg.norm(X, axis=0)
         for k in range(K-1):
             W = L.dot(V[k,...])
@@ -201,7 +199,7 @@ def lanczos(L, X, K):
 
     def diag_H(a, b, K):
         """Diagonalize the tri-diagonal H matrix."""
-        H = np.zeros((K*K, N), dtype)
+        H = np.zeros((K*K, N), a.dtype)
         H[:K**2:K+1, :] = a
         H[1:(K-1)*K:K+1, :] = b[1:,:]
         H.shape = (K, K, N)
@@ -211,7 +209,7 @@ def lanczos(L, X, K):
 
     V, a, b = basis(L, X, K)
     Q = diag_H(a, b, K)
-    Xt = np.empty((K, M, N), dtype)
+    Xt = np.empty((K, M, N), L.dtype)
     for n in range(N):
         #Xt[...,n] = Q[...,n].T @ V[...,n]
         Xt[...,n] = Q[...,n].T.dot(V[...,n])
@@ -223,7 +221,7 @@ def lanczos(L, X, K):
 def rescale_L(L, lmax=2):
     """Rescale the Laplacian eigenvalues in [-1,1]."""
     M, M = L.shape
-    I = scipy.sparse.identity(M, format='csr', dtype=dtype)
+    I = scipy.sparse.identity(M, format='csr', dtype=L.dtype)
     L /= lmax * 2
     L -= I
     return L
@@ -232,10 +230,11 @@ def chebyshev(L, X, K):
     """Return T_k X where T_k are the Chebyshev polynomials of order up to K.
     Complexity is O(KMN)."""
     M, N = X.shape
+    assert L.dtype == X.dtype
 
 #    L = rescale_L(L, lmax)
     # Xt = T @ X: MxM @ MxN.
-    Xt = np.empty((K, M, N), dtype)
+    Xt = np.empty((K, M, N), L.dtype)
     # Xt_0 = T_0 X = I X = X.
     Xt[0,...] = X
     # Xt_1 = T_1 X = L X.

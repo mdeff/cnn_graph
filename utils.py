@@ -218,7 +218,7 @@ class TextRCV1(TextDataset):
 ### Helpers to quantify classifier's quality.
 
 
-def baseline(train_data, train_labels, test_data, test_labels):
+def baseline(train_data, train_labels, test_data, test_labels, omit=[]):
     """Train various classifiers to get a baseline."""
     clf, train_accuracy, test_accuracy, train_f1, test_f1, exec_time = [], [], [], [], [], []
     clf.append(sklearn.neighbors.KNeighborsClassifier(n_neighbors=10))
@@ -228,16 +228,17 @@ def baseline(train_data, train_labels, test_data, test_labels):
     clf.append(sklearn.naive_bayes.MultinomialNB(alpha=.01))
     clf.append(sklearn.linear_model.RidgeClassifier())
     clf.append(sklearn.svm.LinearSVC())
-    for c in clf:
-        t_start = time.process_time()
-        c.fit(train_data, train_labels)
-        train_pred = c.predict(train_data)
-        test_pred = c.predict(test_data)
-        train_accuracy.append('{:5.2f}'.format(100*sklearn.metrics.accuracy_score(train_labels, train_pred)))
-        test_accuracy.append('{:5.2f}'.format(100*sklearn.metrics.accuracy_score(test_labels, test_pred)))
-        train_f1.append('{:5.2f}'.format(100*sklearn.metrics.f1_score(train_labels, train_pred, average='weighted')))
-        test_f1.append('{:5.2f}'.format(100*sklearn.metrics.f1_score(test_labels, test_pred, average='weighted')))
-        exec_time.append('{:5.2f}'.format(time.process_time() - t_start))
+    for i,c in enumerate(clf):
+        if i not in omit:
+            t_start = time.process_time()
+            c.fit(train_data, train_labels)
+            train_pred = c.predict(train_data)
+            test_pred = c.predict(test_data)
+            train_accuracy.append('{:5.2f}'.format(100*sklearn.metrics.accuracy_score(train_labels, train_pred)))
+            test_accuracy.append('{:5.2f}'.format(100*sklearn.metrics.accuracy_score(test_labels, test_pred)))
+            train_f1.append('{:5.2f}'.format(100*sklearn.metrics.f1_score(train_labels, train_pred, average='weighted')))
+            test_f1.append('{:5.2f}'.format(100*sklearn.metrics.f1_score(test_labels, test_pred, average='weighted')))
+            exec_time.append('{:5.2f}'.format(time.process_time() - t_start))
     print('Train accuracy:      {}'.format(' '.join(train_accuracy)))
     print('Test accuracy:       {}'.format(' '.join(test_accuracy)))
     print('Train F1 (weighted): {}'.format(' '.join(train_f1)))
@@ -255,12 +256,12 @@ def grid_search(params, grid_params, train_data, train_labels, val_data,
         params.update(grid_params)
         name = '{}'.format(grid)
         print('\n\n  {}  \n\n'.format(grid_params))
-        model = model(params)
-        model.fit(train_data, train_labels, val_data, val_labels)
-        string, accuracy, f1, loss = model.evaluate(train_data, train_labels)
+        m = model(params)
+        m.fit(train_data, train_labels, val_data, val_labels)
+        string, accuracy, f1, loss = m.evaluate(train_data, train_labels)
         train_accuracy.append('{:5.2f}'.format(accuracy)); train_f1.append('{:5.2f}'.format(f1))
         print('train {}'.format(string))
-        string, accuracy, f1, loss = model.evaluate(test_data, test_labels)
+        string, accuracy, f1, loss = m.evaluate(test_data, test_labels)
         test_accuracy.append('{:5.2f}'.format(accuracy)); test_f1.append('{:5.2f}'.format(f1))
         print('test  {}'.format(string))
     print('\n\n')
