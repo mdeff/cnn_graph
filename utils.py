@@ -139,12 +139,14 @@ class TextDataset(object):
             model = gensim.models.Word2Vec(Sentences(self.documents), size)
         self.embeddings = np.empty((len(self.vocab), size))
         keep = []
+        not_found = 0
         for i,word in enumerate(self.vocab):
             try:
                 self.embeddings[i,:] = model[word]
                 keep.append(i)
             except KeyError:
-                print('not found in corpus: {} (idx {})'.format(word, i))
+                not_found += 1
+        print('{} words not found in corpus'.format(not_found, i))
         self.keep_words(keep)
 
 class Text20News(TextDataset):
