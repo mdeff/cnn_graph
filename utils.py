@@ -273,3 +273,51 @@ def grid_search(params, grid_params, train_data, train_labels, val_data,
     print('Test F1 (weighted):  {}'.format(' '.join(test_f1)))
     for i,grid_params in enumerate(grid):
         print('{} --> {} {} {} {}'.format(grid_params, train_accuracy[i], test_accuracy[i], train_f1[i], test_f1[i]))
+
+
+class model_perf(object):
+
+    def __init__(s):
+        s.names, s.params = set(), {}
+        s.fit_accuracies, s.fit_losses, s.fit_time = {}, {}, {}
+        s.train_accuracy, s.train_f1, s.train_loss = {}, {}, {}
+        s.test_accuracy, s.test_f1, s.test_loss = {}, {}, {}
+
+    def test(s, model, name, params, train_data, train_labels, val_data, val_labels, test_data, test_labels):
+        s.params[name] = params
+        s.fit_accuracies[name], s.fit_losses[name], s.fit_time[name] = \
+                model.fit(train_data, train_labels, val_data, val_labels)
+        string, s.train_accuracy[name], s.train_f1[name], s.train_loss[name] = \
+                model.evaluate(train_data, train_labels)
+        print('train {}'.format(string))
+        string, s.test_accuracy[name], s.test_f1[name], s.test_loss[name] = \
+                model.evaluate(test_data, test_labels)
+        print('test  {}'.format(string))
+        s.names.add(name)
+
+    def show(s):
+        print('  accuracy        F1             loss        time [ms]  name')
+        print('test  train   test  train   test     train')
+        for name in sorted(s.names):
+            print('{:5.2f} {:5.2f}   {:5.2f} {:5.2f}   {:.2e} {:.2e}   {:3.0f}   {}'.format(
+                    s.test_accuracy[name], s.train_accuracy[name],
+                    s.test_f1[name], s.train_f1[name],
+                    s.test_loss[name], s.train_loss[name], s.fit_time[name]*1000, name))
+
+        fig1 = plt.figure(figsize=(15,5))
+        fig2 = plt.figure(figsize=(15,5))
+        ax1 = fig1.add_subplot(111)
+        ax2 = fig2.add_subplot(111)
+        for name in sorted(s.names):
+            steps = np.arange(len(s.fit_accuracies[name])) + 1
+            steps *= s.params[name]['eval_frequency']
+            ax1.plot(steps, s.fit_accuracies[name], '.-', label=name)
+            ax2.plot(steps, s.fit_losses[name], '.-', label=name)
+        ax1.set_xlabel('step')
+        ax2.set_xlabel('step')
+        ax1.set_ylabel('validation accuracy')
+        ax2.set_ylabel('training loss')
+        ax1.legend(loc='lower right')
+        ax2.legend(loc='upper right')
+        #fig1.savefig('fit_accuracies.pdf')
+        #fig2.savefig('fit_losses.pdf')
