@@ -46,10 +46,11 @@ def metis(W, levels, rid=None):
 
         # PAIR THE VERTICES AND CONSTRUCT THE ROOT VECTOR
         idx_row, idx_col, val = scipy.sparse.find(W)
-        cc = idx_row
-        rr = idx_col
-        vv = val
-        cluster_id = metis_one_level(cc,rr,vv,rid,weights) # cc is ordered
+        perm = np.argsort(idx_row)
+        rr = idx_row[perm]
+        cc = idx_col[perm]
+        vv = val[perm]
+        cluster_id = metis_one_level(rr,cc,vv,rid,weights)  # rr is ordered
         parents.append(cluster_id)
 
         # TO DO
