@@ -59,13 +59,13 @@ docs/_build/
 target/
 
 # IPython checkpoints
-.ipynb_checkpoints
+.ipynb_checkpoints/
 
 # Datasets
-*data*
+data/
 
 # Tensorflow summaries
-summaries
+summaries/
 
 # Model parameters
-checkpoints
+checkpoints/
