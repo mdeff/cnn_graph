@@ -1,4 +1,5 @@
-import sklearn
+import sklearn.metrics
+import sklearn.neighbors
 import matplotlib.pyplot as plt
 import scipy.sparse, scipy.sparse.linalg  # scipy.spatial.distance
 import numpy as np
