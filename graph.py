@@ -54,7 +54,6 @@ def adjacency(dist, idx):
     M, k = dist.shape
     assert M, k == idx.shape
     assert dist.min() >= 0
-    assert dist.max() <= 1
 
     # Weights.
     sigma2 = np.mean(dist[:,-1])**2
