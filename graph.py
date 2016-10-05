@@ -1,22 +1,23 @@
 import sklearn.metrics
 import sklearn.neighbors
 import matplotlib.pyplot as plt
-import scipy.sparse, scipy.sparse.linalg  # scipy.spatial.distance
+import scipy.sparse
+import scipy.sparse.linalg
+import scipy.spatial.distance
 import numpy as np
+
 
 def grid(m, dtype=np.float32):
     """Return the embedding of a grid graph."""
     M = m**2
-    x = np.linspace(0,1,m, dtype=dtype)
-    y = np.linspace(0,1,m, dtype=dtype)
+    x = np.linspace(0, 1, m, dtype=dtype)
+    y = np.linspace(0, 1, m, dtype=dtype)
     xx, yy = np.meshgrid(x, y)
-    z = np.empty((M,2), dtype)
-    z[:,0] = xx.reshape(M)
-    z[:,1] = yy.reshape(M)
+    z = np.empty((M, 2), dtype)
+    z[:, 0] = xx.reshape(M)
+    z[:, 1] = yy.reshape(M)
     return z
 
-#class graph(object):
-    #self.L
 
 def distance_scipy_spatial(z, k=4, metric='euclidean'):
     """Compute exact pairwise distances."""
@@ -28,14 +29,17 @@ def distance_scipy_spatial(z, k=4, metric='euclidean'):
     d = d[:, 1:k+1]
     return d, idx
 
+
 def distance_sklearn_metrics(z, k=4, metric='euclidean'):
     """Compute exact pairwise distances."""
-    d = sklearn.metrics.pairwise.pairwise_distances(z, metric=metric, n_jobs=-2)
+    d = sklearn.metrics.pairwise.pairwise_distances(
+            z, metric=metric, n_jobs=-2)
     # k-NN graph.
-    idx = np.argsort(d)[:,1:k+1]
+    idx = np.argsort(d)[:, 1:k+1]
     d.sort()
-    d = d[:,1:k+1]
+    d = d[:, 1:k+1]
     return d, idx
+
 
 def distance_lshforest(z, k=4, metric='cosine'):
     """Return an approximation of the k-nearest cosine distances."""
@@ -44,10 +48,11 @@ def distance_lshforest(z, k=4, metric='cosine'):
     lshf.fit(z)
     dist, idx = lshf.kneighbors(z, n_neighbors=k+1)
     assert dist.min() < 1e-10
-    dist[dist<0] = 0
+    dist[dist < 0] = 0
     return dist, idx
 
-# TODO: sklearn neighbors, PANN, Annoy, FLANN
+# TODO: other ANNs s.a. NMSLIB, EFANNA, FLANN, Annoy, sklearn neighbors, PANN
+
 
 def adjacency(dist, idx):
     """Return the adjacency matrix of a kNN graph."""
@@ -56,7 +61,7 @@ def adjacency(dist, idx):
     assert dist.min() >= 0
 
     # Weights.
-    sigma2 = np.mean(dist[:,-1])**2
+    sigma2 = np.mean(dist[:, -1])**2
     dist = np.exp(- dist**2 / sigma2)
 
     # Weight matrix.
@@ -77,6 +82,7 @@ def adjacency(dist, idx):
     assert type(W) is scipy.sparse.csr.csr_matrix
     return W
 
+
 def replace_random_edges(A, noise_level):
     """Replace randomly chosen edges by random edges."""
     M, M = A.shape
@@ -93,19 +99,20 @@ def replace_random_edges(A, noise_level):
     assert A_coo.nnz >= n
     A = A.tolil()
 
-    for idx,row,col,val in zip(indices,rows,cols,vals):
+    for idx, row, col, val in zip(indices, rows, cols, vals):
         old_row = A_coo.row[idx]
         old_col = A_coo.col[idx]
 
-        A[old_row,old_col] = 0
-        A[old_col,old_row] = 0
-        A[row,col] = 1
-        A[col,row] = 1
+        A[old_row, old_col] = 0
+        A[old_col, old_row] = 0
+        A[row, col] = 1
+        A[col, row] = 1
 
     A.setdiag(0)
     A = A.tocsr()
     A.eliminate_zeros()
     return A
+
 
 def laplacian(W, normalized=True):
     """Return the Laplacian of the weigth matrix."""
@@ -128,6 +135,7 @@ def laplacian(W, normalized=True):
     assert type(L) is scipy.sparse.csr.csr_matrix
     return L
 
+
 def lmax(L, normalized=True):
     """Upper-bound on the spectrum."""
     if normalized:
@@ -136,12 +144,13 @@ def lmax(L, normalized=True):
         return scipy.sparse.linalg.eigsh(
                 L, k=1, which='LM', return_eigenvectors=False)[0]
 
+
 def fourier(L, algo='eigh', k=1):
     """Return the Fourier basis, i.e. the EVD of the Laplacian."""
 
     def sort(lamb, U):
         idx = lamb.argsort()
-        return lamb[idx], U[:,idx]
+        return lamb[idx], U[:, idx]
 
     if algo is 'eig':
         lamb, U = np.linalg.eig(L.toarray())
@@ -156,19 +165,21 @@ def fourier(L, algo='eigh', k=1):
 
     return lamb, U
 
+
 def plot_spectrum(L, algo='eig'):
     """Plot the spectrum of a list of multi-scale Laplacians L."""
     # Algo is eig to be sure to get all eigenvalues.
-    plt.figure(figsize=(17,5))
-    for i,lap in enumerate(L):
+    plt.figure(figsize=(17, 5))
+    for i, lap in enumerate(L):
         lamb, U = fourier(lap, algo)
         step = 2**i
         x = range(step//2, L[0].shape[0], step)
-        label = 'L_{} spectrum in [{:1.2e}, {:1.2e}]'.format(i, lamb[0], lamb[-1])
-        plt.plot(x, lamb, '.', label=label)
+        lb = 'L_{} spectrum in [{:1.2e}, {:1.2e}]'.format(i, lamb[0], lamb[-1])
+        plt.plot(x, lamb, '.', label=lb)
     plt.legend(loc='best')
     plt.xlim(0, L[0].shape[0])
     plt.ylim(ymin=0)
+
 
 def lanczos(L, X, K):
     """
@@ -187,36 +198,36 @@ def lanczos(L, X, K):
         a = np.empty((K, N), L.dtype)
         b = np.zeros((K, N), L.dtype)
         V = np.empty((K, M, N), L.dtype)
-        V[0,...] = X / np.linalg.norm(X, axis=0)
+        V[0, ...] = X / np.linalg.norm(X, axis=0)
         for k in range(K-1):
-            W = L.dot(V[k,...])
-            a[k,:] = np.sum(W * V[k,...], axis=0)
-            W = W - a[k,:] * V[k,...] - (b[k,:] * V[k-1,...] if k>0 else 0)
-            b[k+1,:] = np.linalg.norm(W, axis=0)
-            V[k+1,...] = W / b[k+1,:]
-        a[K-1,:] = np.sum(L.dot(V[K-1,...]) * V[K-1,...], axis=0)
+            W = L.dot(V[k, ...])
+            a[k, :] = np.sum(W * V[k, ...], axis=0)
+            W = W - a[k, :] * V[k, ...] - (
+                    b[k, :] * V[k-1, ...] if k > 0 else 0)
+            b[k+1, :] = np.linalg.norm(W, axis=0)
+            V[k+1, ...] = W / b[k+1, :]
+        a[K-1, :] = np.sum(L.dot(V[K-1, ...]) * V[K-1, ...], axis=0)
         return V, a, b
 
     def diag_H(a, b, K):
         """Diagonalize the tri-diagonal H matrix."""
         H = np.zeros((K*K, N), a.dtype)
         H[:K**2:K+1, :] = a
-        H[1:(K-1)*K:K+1, :] = b[1:,:]
+        H[1:(K-1)*K:K+1, :] = b[1:, :]
         H.shape = (K, K, N)
         Q = np.linalg.eigh(H.T, UPLO='L')[1]
-        Q = np.swapaxes(Q,1,2).T
+        Q = np.swapaxes(Q, 1, 2).T
         return Q
 
     V, a, b = basis(L, X, K)
     Q = diag_H(a, b, K)
     Xt = np.empty((K, M, N), L.dtype)
     for n in range(N):
-        #Xt[...,n] = Q[...,n].T @ V[...,n]
-        Xt[...,n] = Q[...,n].T.dot(V[...,n])
-    Xt *= Q[0,:,np.newaxis,:]
+        Xt[..., n] = Q[..., n].T.dot(V[..., n])
+    Xt *= Q[0, :, np.newaxis, :]
     Xt *= np.linalg.norm(X, axis=0)
-    return Xt
-#    return Xt, Q[0,...]
+    return Xt  # Q[0, ...]
+
 
 def rescale_L(L, lmax=2):
     """Rescale the Laplacian eigenvalues in [-1,1]."""
@@ -226,21 +237,22 @@ def rescale_L(L, lmax=2):
     L -= I
     return L
 
+
 def chebyshev(L, X, K):
     """Return T_k X where T_k are the Chebyshev polynomials of order up to K.
     Complexity is O(KMN)."""
     M, N = X.shape
     assert L.dtype == X.dtype
 
-#    L = rescale_L(L, lmax)
+    # L = rescale_L(L, lmax)
     # Xt = T @ X: MxM @ MxN.
     Xt = np.empty((K, M, N), L.dtype)
     # Xt_0 = T_0 X = I X = X.
-    Xt[0,...] = X
+    Xt[0, ...] = X
     # Xt_1 = T_1 X = L X.
     if K > 1:
-        Xt[1,...] = L.dot(X)
+        Xt[1, ...] = L.dot(X)
     # Xt_k = 2 L Xt_k-1 - Xt_k-2.
     for k in range(2, K):
-        Xt[k,...] = 2 * L.dot(Xt[k-1,...]) - Xt[k-2,...]
+        Xt[k, ...] = 2 * L.dot(Xt[k-1, ...]) - Xt[k-2, ...]
     return Xt
