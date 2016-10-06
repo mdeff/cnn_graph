@@ -233,6 +233,6 @@ def perm_adjacency(A, indices):
     A.row = np.array(perm)[A.row]
     A.col = np.array(perm)[A.col]
 
-    assert np.abs(A - A.T).mean() < 1e-9
+    # assert np.abs(A - A.T).mean() < 1e-9
     assert type(A) is scipy.sparse.coo.coo_matrix
     return A
