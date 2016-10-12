@@ -131,7 +131,7 @@ def laplacian(W, normalized=True):
         I = scipy.sparse.identity(d.size, dtype=W.dtype)
         L = I - D * W * D
 
-    assert np.abs(L - L.T).mean() < 1e-9
+    # assert np.abs(L - L.T).mean() < 1e-9
     assert type(L) is scipy.sparse.csr.csr_matrix
     return L
 
