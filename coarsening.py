@@ -2,6 +2,35 @@ import numpy as np
 import scipy.sparse
 
 
+def coarsen(A, levels, self_connections=False):
+    """
+    Coarsen a graph, represented by its adjacency matrix A, at multiple
+    levels.
+    """
+    graphs, parents = metis(A, levels)
+    perms = compute_perm(parents)
+
+    for i, A in enumerate(graphs):
+        M, M = A.shape
+
+        if not self_connections:
+            A = A.tocoo()
+            A.setdiag(0)
+
+        if i < levels:
+            A = perm_adjacency(A, perms[i])
+
+        A = A.tocsr()
+        A.eliminate_zeros()
+        graphs[i] = A
+
+        Mnew, Mnew = A.shape
+        print('Layer {0}: M_{0} = |V| = {1} nodes ({2} added),'
+              '|E| = {3} edges'.format(i, Mnew, Mnew-M, A.nnz//2))
+
+    return graphs, perms[0] if levels > 0 else None
+
+
 def metis(W, levels, rid=None):
     """
     Coarsen a graph multiple times using the METIS algorithm.
