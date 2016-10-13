@@ -220,13 +220,15 @@ def perm_adjacency(A, indices):
 
     M, M = A.shape
     Mnew = len(indices)
+    assert Mnew >= M
     A = A.tocoo()
 
     # Add Mnew - M isolated vertices.
-    rows = scipy.sparse.coo_matrix((Mnew-M,    M), dtype=np.float32)
-    cols = scipy.sparse.coo_matrix((Mnew, Mnew-M), dtype=np.float32)
-    A = scipy.sparse.vstack([A, rows])
-    A = scipy.sparse.hstack([A, cols])
+    if Mnew > M:
+        rows = scipy.sparse.coo_matrix((Mnew-M,    M), dtype=np.float32)
+        cols = scipy.sparse.coo_matrix((Mnew, Mnew-M), dtype=np.float32)
+        A = scipy.sparse.vstack([A, rows])
+        A = scipy.sparse.hstack([A, cols])
 
     # Permute the rows and the columns.
     perm = np.argsort(indices)
