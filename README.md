@@ -35,7 +35,20 @@ Information Processing Systems (NIPS), 2016.
 
 ## Reproducing our results
 
-Run all the notebooks to reproduce the experiments presented in the paper.
+Run all the notebooks to reproduce the experiments on [MNIST](mnist.ipynb) and
+[20NEWS](20news.ipynb) presented in the paper.
 ```sh
-make run
+make exp
 ```
+
+## Using the model
+
+To use our graph ConvNet on your data, you need:
+
+1. a data matrix where each row is a sample and each column is a feature,
+2. a target vector,
+3. optionally, an adjacency matrix which encodes the structure as a graph.
+
+See the [usage notebook](usage.ipynb) for a simple example with fabricated
+data. Please get in touch if you are unsure about applying the model to
+a different setting.
