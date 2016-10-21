@@ -304,20 +304,18 @@ class model_perf(object):
                     s.test_f1[name], s.train_f1[name],
                     s.test_loss[name], s.train_loss[name], s.fit_time[name]*1000, name))
 
-        fig1 = plt.figure(figsize=(15,5))
-        fig2 = plt.figure(figsize=(15,5))
-        ax1 = fig1.add_subplot(111)
-        ax2 = fig2.add_subplot(111)
+        fig, ax = plt.subplots(1, 2, figsize=(15, 5))
         for name in sorted(s.names):
             steps = np.arange(len(s.fit_accuracies[name])) + 1
             steps *= s.params[name]['eval_frequency']
-            ax1.plot(steps, s.fit_accuracies[name], '.-', label=name)
-            ax2.plot(steps, s.fit_losses[name], '.-', label=name)
-        ax1.set_xlabel('step')
-        ax2.set_xlabel('step')
-        ax1.set_ylabel('validation accuracy')
-        ax2.set_ylabel('training loss')
-        ax1.legend(loc='lower right')
-        ax2.legend(loc='upper right')
-        #fig1.savefig('fit_accuracies.pdf')
-        #fig2.savefig('fit_losses.pdf')
+            ax[0].plot(steps, s.fit_accuracies[name], '.-', label=name)
+            ax[1].plot(steps, s.fit_losses[name], '.-', label=name)
+        ax[0].set_xlim(min(steps), max(steps))
+        ax[1].set_xlim(min(steps), max(steps))
+        ax[0].set_xlabel('step')
+        ax[1].set_xlabel('step')
+        ax[0].set_ylabel('validation accuracy')
+        ax[1].set_ylabel('training loss')
+        ax[0].legend(loc='lower right')
+        ax[1].legend(loc='upper right')
+        #fig.savefig('training.pdf')
