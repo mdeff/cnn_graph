@@ -4,7 +4,7 @@ import tensorflow as tf
 import sklearn
 import scipy.sparse
 import numpy as np
-import os, time, collections
+import os, time, collections, shutil
 
 
 #NFEATURES = 28**2
@@ -83,10 +83,11 @@ class base_model(object):
     def fit(self, train_data, train_labels, val_data, val_labels):
         t_process, t_wall = time.process_time(), time.time()
         sess = tf.Session(graph=self.graph)
-        writer = tf.train.SummaryWriter(os.path.join('summaries', self.dir_name), self.graph)
-        path = os.path.join('checkpoints', self.dir_name)
-        os.makedirs(path, exist_ok=True)
-        path = os.path.join(path, 'model')
+        shutil.rmtree(self._get_path('summaries'), ignore_errors=True)
+        writer = tf.train.SummaryWriter(self._get_path('summaries'), self.graph)
+        shutil.rmtree(self._get_path('checkpoints'), ignore_errors=True)
+        os.makedirs(self._get_path('checkpoints'))
+        path = os.path.join(self._get_path('checkpoints'), 'model')
         sess.run(self.op_init)
 
         # Training.
@@ -256,11 +257,15 @@ class base_model(object):
 
     # Helper methods.
 
+    def _get_path(self, folder):
+        path = os.path.dirname(os.path.realpath(__file__))
+        return os.path.join(path, '..', folder, self.dir_name)
+
     def _get_session(self, sess=None):
         """Restore parameters if no session given."""
         if sess is None:
             sess = tf.Session(graph=self.graph)
-            filename = tf.train.latest_checkpoint(os.path.join('checkpoints', self.dir_name))
+            filename = tf.train.latest_checkpoint(self._get_path('checkpoints'))
             self.op_saver.restore(sess, filename)
         return sess
 
