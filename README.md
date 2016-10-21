@@ -16,7 +16,7 @@ Information Processing Systems (NIPS), 2016.
 ## Installation
 
 1. Clone this repository.
-   ```shell
+   ```sh
    git clone https://github.com/mdeff/cnn_graph
    cd cnn_graph
    ```
@@ -35,10 +35,12 @@ Information Processing Systems (NIPS), 2016.
 
 ## Reproducing our results
 
-Run all the notebooks to reproduce the experiments on [MNIST](mnist.ipynb) and
-[20NEWS](20news.ipynb) presented in the paper.
+Run all the notebooks to reproduce the experiments on
+[MNIST](nips2016/mnist.ipynb) and [20NEWS](nips2016/20news.ipynb) presented in
+the paper.
 ```sh
-make exp
+cd nips2016
+make
 ```
 
 ## Using the model
