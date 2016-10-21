@@ -1,26 +1,28 @@
-TRIALS = $(sort $(wildcard trials/*.ipynb))
-EXP    = $(sort $(wildcard *.ipynb))
+NB = $(sort $(wildcard *.ipynb))
+DIRS = nips2016 trials
 
-NBRUN   = jupyter nbconvert --inplace --execute --ExecutePreprocessor.timeout=-1
-NBCLEAN = jupyter nbconvert --inplace --ClearOutputPreprocessor.enabled=True
+CLEANDIRS = $(DIRS:%=clean-%)
 
-all: exp trials
+run: $(NB) $(DIRS)
 
-exp:
-	$(NBRUN) $(EXP)
+$(NB):
+	jupyter nbconvert --inplace --execute --ExecutePreprocessor.timeout=-1 $@
 
-trials:
-	$(NBRUN) $(TRIALS)
+$(DIRS):
+	$(MAKE) -C $@
+
+clean: $(CLEANDIRS)
+	jupyter nbconvert --inplace --ClearOutputPreprocessor.enabled=True $(NB)
+	#rm -rf **/*.pyc
+
+$(CLEANDIRS):
+	$(MAKE) clean -C $(@:clean-%=%)
 
 install:
 	pip install --upgrade pip
 	pip install -r requirements.txt
 
-clean:
-	$(NBCLEAN) $(TRIALS)
-	$(NBCLEAN) $(EXP)
-
 readme:
 	grip README.md
 
-.PHONY: all exp trials install clean readme
+.PHONY: run $(NB) $(DIRS) clean $(CLEANDIRS) install readme
