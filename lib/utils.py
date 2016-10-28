@@ -295,7 +295,17 @@ class model_perf(object):
         print('test  {}'.format(string))
         s.names.add(name)
 
-    def show(s):
+    def show(s, fontsize=None):
+        if fontsize:
+            plt.rc('pdf', fonttype=42)
+            plt.rc('ps', fonttype=42)
+            plt.rc('font', size=fontsize)         # controls default text sizes
+            plt.rc('axes', titlesize=fontsize)    # fontsize of the axes title
+            plt.rc('axes', labelsize=fontsize)    # fontsize of the x any y labels
+            plt.rc('xtick', labelsize=fontsize)   # fontsize of the tick labels
+            plt.rc('ytick', labelsize=fontsize)   # fontsize of the tick labels
+            plt.rc('legend', fontsize=fontsize)   # legend fontsize
+            plt.rc('figure', titlesize=fontsize)  # size of the figure title
         print('  accuracy        F1             loss        time [ms]  name')
         print('test  train   test  train   test     train')
         for name in sorted(s.names):
