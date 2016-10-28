@@ -51,6 +51,8 @@ To use our graph ConvNet on your data, you need:
 2. a target vector,
 3. optionally, an adjacency matrix which encodes the structure as a graph.
 
-See the [usage notebook](usage.ipynb) for a simple example with fabricated
-data. Please get in touch if you are unsure about applying the model to
-a different setting.
+See the [usage notebook][usage] for a simple example with fabricated data.
+Please get in touch if you are unsure about applying the model to a different
+setting.
+
+[usage]: http://nbviewer.jupyter.org/github/mdeff/cnn_graph/blob/outputs/usage.ipynb
