@@ -32,7 +32,8 @@ There is also implementations of the filters used in:
 
 2. Install the dependencies. Please edit `requirements.txt` to choose the
    TensorFlow version (CPU / GPU, Linux / Mac) you want to install, or install
-   it beforehand. The code was developed with TF 0.8.
+   it beforehand. The code was developed with TF 0.8 but people have used it
+   with newer versions.
    ```sh
    pip install -r requirements.txt  # or make install
    ```
