@@ -11,7 +11,16 @@ Information Processing Systems (NIPS), 2016.
 * Please cite the above paper if you use our code.
 * The code is released under the terms of the [MIT license](LICENSE.txt).
 
-[arXiv]: https://arxiv.org/abs/1606.09375
+There is also implementations of the filters used in:
+* Joan Bruna, Wojciech Zaremba, Arthur Szlam, Yann LeCun, [Spectral Networks
+  and Locally Connected Networks on Graphs][bruna], International Conference on
+  Learning Representations (ICLR), 2014.
+* Mikael Henaff, Joan Bruna and Yann LeCun, [Deep Convolutional Networks on
+  Graph-Structured Data][henaff], arXiv, 2015.
+
+[arXiv]:  https://arxiv.org/abs/1606.09375
+[bruna]:  https://arxiv.org/abs/1312.6203
+[henaff]: https://arxiv.org/abs/1506.05163
 
 ## Installation
 
