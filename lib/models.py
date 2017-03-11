@@ -351,7 +351,7 @@ class fcnn2(base_model):
             # Transform to Fourier domain
             x_2d = tf.reshape(x, [-1, 28, 28])
             x_2d = tf.complex(x_2d, 0)
-            xf_2d = tf.batch_fft2d(x_2d)
+            xf_2d = tf.fft2d(x_2d)
             xf = tf.reshape(xf_2d, [-1, NFEATURES])
             xf = tf.expand_dims(xf, 1)  # NSAMPLES x 1 x NFEATURES
             xf = tf.transpose(xf)  # NFEATURES x 1 x NSAMPLES
@@ -361,7 +361,7 @@ class fcnn2(base_model):
             W = tf.complex(Wreal, Wimg)
             xf = xf[:int(NFEATURES/2), :, :]
             yf = tf.matmul(W, xf)  # for each feature
-            yf = tf.concat(values=[yf, tf.conj(yf)], axis=0)
+            yf = tf.concat([yf, tf.conj(yf)], axis=0)
             yf = tf.transpose(yf)  # NSAMPLES x NFILTERS x NFEATURES
             yf_2d = tf.reshape(yf, [-1, 28, 28])
             # Transform back to spatial domain
@@ -632,7 +632,7 @@ class cgcnn2_5(base_model):
             xt = tf.expand_dims(xt0, 0)  # 1 x M x N
             def concat(xt, x):
                 x = tf.expand_dims(x, 0)  # 1 x M x N
-                return tf.concat(values=[xt, x], axis=0)  # K x M x N
+                return tf.concat([xt, x], axis=0)  # K x M x N
             if self.K > 1:
                 xt1 = tf.sparse_tensor_dense_matmul(self.L, xt0)
                 xt = concat(xt, xt1)
@@ -893,7 +893,7 @@ class cgcnn(base_model):
         x = tf.expand_dims(x0, 0)  # 1 x M x Fin*N
         def concat(x, x_):
             x_ = tf.expand_dims(x_, 0)  # 1 x M x Fin*N
-            return tf.concat(values=[x, x_], axis=0)  # K x M x Fin*N
+            return tf.concat([x, x_], axis=0)  # K x M x Fin*N
         if K > 1:
             x1 = tf.sparse_tensor_dense_matmul(L, x0)
             x = concat(x, x1)
