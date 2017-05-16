@@ -1,11 +1,22 @@
 numpy
 scipy
+pandas
+tables
 scikit-learn
 matplotlib
+seaborn
 
-gensim
 tensorflow-gpu
 #tensorflow
 
 jupyter
 ipython
+
+python-dotenv
+tqdm
+
+# Only needed for NLP experiments.
+gensim
+
+# Cannot be installed with pip.
+#graph-tool
