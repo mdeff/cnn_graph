@@ -1,4 +1,4 @@
-# Spectral Graph Convolutional Neural Network (SGCNN)
+# Convolutional Neural Networks on Graphs with Fast Localized Spectral Filtering
 
 The code in this repository implements an efficient generalization of the
 popular Convolutional Neural Networks (CNNs) to arbitrary graphs, presented in
