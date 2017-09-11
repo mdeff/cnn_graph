@@ -12,13 +12,17 @@ The code is released under the terms of the [MIT license](LICENSE.txt). Please
 cite the above paper if you use it.
 
 Additional material:
-* [NIPS2016 spotlight video][video]
-* [Deep Learning on Graphs][slides_ntds]
-  (lecture for EPFL's master course [A Network Tour of Data Science][ntds])
+* [NIPS2016 spotlight video][video], 2016-11-22.
+* [Deep Learning on Graphs][slides_ntds], a lecture for EPFL's master course [A
+  Network Tour of Data Science][ntds], 2016-12-21.
+* [Deep Learning on Graphs][slides_dlid], an invited talk at the [Deep Learning on
+  Irregular Domains][dlid] workshop of BMVC, 2017-09-17.
 
 [video]: https://www.youtube.com/watch?v=cIA_m7vwOVQ
-[slides_ntds]: http://dx.doi.org/10.6084/m9.figshare.4491686
+[slides_ntds]: https://doi.org/10.6084/m9.figshare.4491686
 [ntds]: https://github.com/mdeff/ntds_2016
+[slides_dlid]: https://doi.org/10.6084/m9.figshare.5394805
+[dlid]: http://dlid.swansea.ac.uk
 
 There is also implementations of the filters used in:
 * Joan Bruna, Wojciech Zaremba, Arthur Szlam, Yann LeCun, [Spectral Networks
