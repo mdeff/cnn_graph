@@ -241,3 +241,19 @@ class Dense(Layer):
         b = self._bias_variable([self.Mout], regularization=True)
         x = tf.matmul(x, W) + b
         return tf.nn.relu(x) if self.relu else x
+
+
+class RNN(Layer):
+    pass
+
+
+class LSTM(RNN):
+    pass
+
+
+class ConvLSTM(RNN):
+    pass
+
+
+class GRU(RNN):
+    pass
