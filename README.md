@@ -8,9 +8,6 @@ Michaël Defferrard, Xavier Bresson, Pierre Vandergheynst, [Convolutional Neural
 Networks on Graphs with Fast Localized Spectral Filtering][arXiv], Neural
 Information Processing Systems (NIPS), 2016.
 
-The code is released under the terms of the [MIT license](LICENSE.txt). Please
-cite the above paper if you use it.
-
 Additional material:
 * [NIPS2016 spotlight video][video], 2016-11-22.
 * [Deep Learning on Graphs][slides_ntds], a lecture for EPFL's master course [A
@@ -76,3 +73,18 @@ Please get in touch if you are unsure about applying the model to a different
 setting.
 
 [usage]: http://nbviewer.jupyter.org/github/mdeff/cnn_graph/blob/outputs/usage.ipynb
+
+## License & co
+
+The code in this repository is released under the terms of the [MIT license](LICENSE.txt).
+Please cite our [paper][arXiv] if you use it.
+
+```
+@inproceedings{cnn_graph,
+  title = {Convolutional Neural Networks on Graphs with Fast Localized Spectral Filtering},
+  author = {Defferrard, Micha\"el and Bresson, Xavier and Vandergheynst, Pierre},
+  booktitle = {Advances in Neural Information Processing Systems},
+  year = {2016},
+  url = {https://arxiv.org/abs/1606.09375},
+}
+```
