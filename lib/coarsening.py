@@ -228,15 +228,12 @@ def perm_data(x, indices):
     Mnew = len(indices)
     assert Mnew >= M
     xnew = np.empty((N, Mnew))
-    for i,j in enumerate(indices):
-        # Existing vertex, i.e. real data.
-        if j < M:
-            xnew[:,i] = x[:,j]
-        # Fake vertex because of singeltons.
-        # They will stay 0 so that max pooling chooses the singelton.
-        # Or -infty ?
-        else:
-            xnew[:,i] = np.zeros(N)
+    for new_node_1, old_node_1 in enumerate(indices):
+        for new_node_2, old_node_2 in enumerate(indices):
+            if old_node_1 < N  and old_node_2 < M :
+                xnew[new_node_1, new_node_2] = x[old_node_1, old_node_2]
+            else: 
+                xnew[new_node_1, new_node_2] = 0
     return xnew
 
 def perm_adjacency(A, indices):
