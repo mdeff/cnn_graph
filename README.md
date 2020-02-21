@@ -74,6 +74,33 @@ setting.
 
 [usage]: http://nbviewer.jupyter.org/github/mdeff/cnn_graph/blob/outputs/usage.ipynb
 
+## Repository organization
+
+* The models (the introduced model and some reference models) are contained in [models.py](models.py).
+* Various side functions are implemented in [graph.py](graph.py), [coarsening.py](coarsening.py) and [utils.py](utils.py).
+* We did experiments on three datasets: MNIST ([notebook](mnist.ipynb)), 20NEWS ([notebook](20news.ipynb)) and RCV1 ([notebook](rcv1.ipynb)).
+* TensorBoard summaries are saved in the `summaries` folder.
+* Model parameters are saved in the `checkpoints` folder.
+* Data is placed in the `data` folder.
+	* [MNIST](http://yann.lecun.com/exdb/mnist/) is downloaded automatically.
+	* [20NEWS](http://qwone.com/~jason/20Newsgroups/) (`20news-bydate.tar.gz`) is downloaded automatically.
+	* [RCV1](http://trec.nist.gov/data/reuters/reuters.html) should be downloaded manually and placed in TODO.
+	* [pre-trained word2vec embeddings](https://code.google.com/archive/p/word2vec/) (`GoogleNews-vectors-negative300.bin.gz`).
+	* Wikipedia graph and activations are available here. Please cite .. if you use it.
+* The [trials](trials) folder contains various small experiences in the form of IPython notebooks.
+	1. [Learning graph filters][trial1]: first experiments on learning
+	   synthesized graph filters through observations of filtered and source
+	   graph signals. The Chebychev and Lanczos methods as well as optimization
+	   methods are compared there.
+	2. [Classification][trial2]: learning filters who extract good features for
+	   classification.
+	3. [TensorFlow][trial3]: first experience with TensorFlow.
+	4. [Coarsening][trial4]: implementation of the Graclus coarsening algorithm
+	   and comparison with a previous matlab implementation.
+* A [makefile](makefile) who runs every notebook as a sanity check. It only runs the code, there is no check on the results.
+
+[trial1]: h
+
 ## License & co
 
 The code in this repository is released under the terms of the [MIT license](LICENSE.txt).
