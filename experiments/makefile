@@ -6,13 +6,6 @@ $(NB):
 	jupyter nbconvert --inplace --execute --ExecutePreprocessor.timeout=-1 $@
 
 clean:
-	@for nb in $(NB); do \
-		printf "%s" "$$(jq --indent 1 ' \
-			.metadata = {} \
-			| (.cells[] | select(has("outputs")) | .outputs) = [] \
-			| (.cells[] | select(has("execution_count")) | .execution_count) = null \
-			| .cells[].metadata = {} \
-			' $$nb)" > $$nb; \
-	done
+	jupyter nbconvert --inplace --ClearOutputPreprocessor.enabled=True $(NB)
 
 .PHONY: run $(NB) clean
