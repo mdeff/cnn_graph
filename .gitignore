@@ -5,11 +5,13 @@ __pycache__/
 # IPython checkpoints
 .ipynb_checkpoints/
 
-# Datasets
+# Local configuration
+.env
+.python-version
+
+# Data
 data/
 
-# Tensorflow summaries
+# Tensorflow summaries & model parameters
 summaries/
-
-# Model parameters
 checkpoints/
